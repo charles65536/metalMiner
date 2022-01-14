@@ -1,0 +1,656 @@
+﻿
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>金属矿工</title>
+	</head>
+
+	<body>
+		
+		<div id="stage" style="margin: 0 auto; width: 970px; height: 700px; text-align: center; vertical-align: middle" >
+			<canvas id="canvas" style="border:1px solid black;" width="965" height="700">
+				不支持画板对象
+			</canvas>
+		</div>
+		<script>
+			var canvas = document.getElementById('canvas');
+			var ctx = canvas.getContext('2d');
+			var state = 0;
+			var gameTime = 30;//多给一秒，防止运行过快而游戏时间缩短
+			var lastGameTime = 0;
+			var gameTimeInterval = 1000;
+			var money = 0;
+			var locx = 0;
+			var locy = 0;
+			var gq = 1;
+			var kg = false;
+			var goalfen = 650;
+			var timeoutId;
+			var bgm1;
+			var dayuanx = -258;
+			var dayuany = 339;
+			var dayuanSpeed = 3.37;
+			var d;
+			var aaaaa;
+			var b;
+			var c;
+			var Buffs = [];
+			bgm1 = "music/bgm1.mp3";
+         	bgm1 = new Audio(bgm1); 
+         	var bgm2;
+			bgm2 = "music/bgm2.mp3";
+         	bgm2 = new Audio(bgm2); 
+         	var bgm3;
+			bgm3 = "music/bgm3.mp3";
+         	bgm3 = new Audio(bgm3); 
+         	var bgm4;
+			bgm4 = "music/bgm4.mp3";
+         	bgm4 = new Audio(bgm4); 
+         	var bgm5;
+			bgm5 = "music/bgm5.mp3";
+         	bgm5 = new Audio(bgm5); 
+         	var jv;
+			jv = "music/jv.mp3";
+         	jv = new Audio(jv); 
+         	var diey;
+			diey = "music/diey.mp3";
+         	diey = new Audio(diey); 
+         	var sl;
+			sl = "music/sl.mp3";
+         	sl = new Audio(sl); 
+         	var bgm;
+         	bgm = "music/bgm.mp3";
+         	bgm = new Audio(bgm);
+         	var bing;
+			bing = "music/bing.mp3";
+         	bing = new Audio(bing); 
+         	var bang;
+			bang = "music/bang.mp3";
+         	bang = new Audio(bang); 
+         	var bycg;
+			bycg = "music/bycg.mp3";
+         	bycg = new Audio(bycg); 
+	var bz;
+			bz = "music/bz.mp3";
+         	bz = new Audio(bz); 
+			var bg1 = new Image();
+			bg1.src = "images/img1.png";
+			var bg2 = new Image();
+			bg2.src = "images/img2.png";
+			var bg3 = new Image();
+			bg3.src = "images/img3.png";
+			var bg4 = new Image();
+			bg4.src = "images/img4.png";
+			var bg5 = new Image();
+			bg5.src = "images/img5.png";
+			var bg6 = new Image();
+			bg6.src = "images/img6.png";
+			var bg7 = new Image();
+			bg7.src = "images/img7.png";
+			var bg8 = new Image();
+			bg8.src = "images/img8.png";
+			var bg9 = new Image();
+			bg9.src = "images/img9.png";
+			var bg10 = new Image();
+			bg10.src = "images/img10.png";
+			var bg11 = new Image();
+			bg11.src = "images/img11.png";
+			var jin = new Image();
+			jin.src = "images/jin.png";
+			var TNT = new Image();
+			TNT.src = "images/TNT.png";
+			var z = new Image();
+			z.src = "images/z.png";
+			var zhh = new Image();
+			zhh.src = "images/zhh.png";
+			var ylk = new Image();
+			ylk.src = "images/ylk.png";
+			var jia = new Image();
+			jia.src = "images/jia.png";
+			var shi1 = new Image();
+			shi1.src = "images/shi1.png";
+			var shi2 = new Image();
+			shi2.src = "images/shi2.png";
+			var n = true;
+			var nnn = 0;
+			var nn = 0;
+			var objects = [];
+			var shoulei = 0;
+			var Goods = [new goods(10,460,bg11,260,58,0,400,jv),
+						new goods(290,405,bg8,80,115,1,50,sl),
+						new goods(400,405,bg9,150,112,2,100,bgm5),
+						new goods(550,420,bg10,150,86,3,70,bz)];
+			var eK = 0;
+			var EK = 0;
+			document.onmousemove = function(e){
+				locx = e.pageX;
+				locy = e.pageY;
+			};		
+			//时间间隔
+			function isAT(lastTime,interval){
+				if(lastTime == 0){
+					return true;
+				}
+				var now = new Date().getTime();
+				return now-lastTime>=interval;
+			}
+			//游戏时间读秒
+			function timej(){
+				if(!isAT(lastGameTime,gameTimeInterval)){
+					return;
+				}
+				lastGameTime = new Date().getTime();
+				gameTime--;
+			}
+			var endy = 1000;
+			function endmoney(){
+				ctx.font ="bold 35px 幼圆";
+				ctx.fillStyle = "rgb(255,255,1)";
+				ctx.fillText("你最终得到的money为:$" + money,290,endy);
+				if(endy > 350){
+					endy-=1;
+				}
+			}
+			function object(x,y,img,width,height,score,speed,type){
+				this.x = x;
+				this.y = y;
+				this.img = img;
+				this.width = width;
+				this.height = height;
+				this.score = score;
+				this.speed = speed; 
+				this.speedx;
+				this.speedy;
+				this.type = type;
+				this.kaiguan = false;
+				this.kaiguan1 = true;
+				this.xiaoshi = false;
+				this.paint = function(){
+					ctx.drawImage(this.img,this.x,this.y);
+				};
+				this.step = function(){
+					if(this.kaiguan){
+						this.x+=this.speedx;
+						this.y+=this.speedy;
+					}
+				};				
+			}
+			function goods(x,y,img,width,height,type,price,bgm){
+				this.x = x;
+				this.y = y;
+				this.img = img;
+				this.width = width;
+				this.height = height;
+				this.type = type;
+				this.price = price;
+				this.bgm = bgm;
+				this.kaiguan = false;
+				this.xiaoshi = false;
+				this.paint = function(){
+					ctx.drawImage(this.img,this.x,this.y);
+					ctx.fillStyle = "green";
+					ctx.font = "30px 幼圆";
+					ctx.fillText("$" + this.price,this.x+this.width/3,548);
+				};				
+			}
+			
+			var gx = 0;
+			var gy = 0;
+			function Append(){
+				if (state == 2){
+					for(var i = 0;i<20;i++){
+						var ran = Math.floor(Math.random() * 11);	
+						switch(ran){
+							case 0:
+							case 1:
+								eK = 0;
+								gx = Math.random()*841+50;
+								gy = Math.random()*(637-300+1)+300;
+								objects[i] = new object(gx,gy,shi1,74,63,20,6,0);
+								break;
+							case 2:
+								gx = Math.random()*866+50;
+								gy = Math.random()*(657-300+1)+300;
+								objects[i] = new object(gx,gy,shi2,49,43,15,6,0);
+								break;
+							case 3:
+							case 4:
+								gx = Math.random()*866+50;
+								gy = Math.random()*(660-300+1)+300;
+								objects[i] = new object(gx,gy,z,25,23,500,1,1);
+								break;
+							case 5:
+								gx = Math.random()*866+50;
+								gy = Math.random()*(651-300+1)+300;
+								objects[i] = new object(gx,gy,TNT,50,49,0,1,2);
+								break;
+							case 6:
+							case 7:		
+							case 8:
+							case 9:
+							case 10:
+								gx = Math.random()*868+50;
+								gy = Math.random()*(658-300+1)+300;
+								objects[i] = new object(gx,gy,jin,47,42,100,3,3);
+								break;						
+						};
+					}
+				}
+			}
+			var xxx;
+			var yyy;
+			function jiaO(x,y,img,width,height){
+				this.x = x;
+				this.y = y;
+				this.img = img;
+				this.width = width;
+				this.height = height;
+				this.n = 0.25;
+				this.xxxx = 1;
+				this.yyyy = 1;
+				this.kaiguan = true;
+				this.kaiguan1 = true;
+				this.kaiguan2 = false;
+				this.kaiguan3 = false;
+				this.paint = function(){
+					ctx.drawImage(this.img,this.x,this.y);
+				};
+				this.hit = function(c){
+      			 		 return this.x - c.width < c.x && c.x < this.x + this.width && this.y - c.height < c.y && c.y < this.y + this.height;
+      				  };
+				this.step = function(){
+					for(var i = 0;i<objects.length;i++){
+						if(objects[i].y <= yyy){
+							console.log(yyy);
+							money+=objects[i].score;
+							objects[i].xiaoshi = true;	
+						}
+					}
+					if (this.kaiguan){						
+						this.x+=this.n;
+						if(this.x>=520){
+							this.n = -0.25;						
+						}else if(this.x<=410){
+							this.n = 0.25;
+						};
+						var a = Math.abs(465-this.x);
+						var yy= parseInt(Math.sqrt(55*55-a*a));
+						this.y = 100 + yy;
+					}else{
+						if (this.kaiguan1){
+							xxx = this.x;
+							yyy = this.y;
+							this.xxxx = -(xxx - dayuanx)/400;
+							this.yyyy = (dayuany - yyy)/400;
+						}
+						this.kaiguan1 = false;
+						this.x+=this.xxxx;
+						this.y+=this.yyyy;
+						if(this.x>=965-this.width||this.x<=0||this.y>=750-this.height||this.kaiguan2){
+							this.xxxx = (xxx - dayuanx)/400;
+							this.yyyy = -(dayuany - yyy)/400;
+							if(this.kaiguan2){
+								if(kg){
+									this.xxxx = (xxx - dayuanx)/300;
+									this.yyyy = -(dayuany - yyy)/300;
+								}else{
+									for (var i=0; i < objects.length; i++) {
+										if(objects[i].kaiguan){
+										 	this.xxxx = (xxx - dayuanx)/400/objects[i].speed;
+											this.yyyy = -(dayuany - yyy)/400/objects[i].speed;									
+										}
+									};
+								}
+							}
+							if(this.kaiguan3){
+								this.xxxx = (xxx - dayuanx)/400;
+								this.yyyy = -(dayuany - yyy)/400;
+							}
+						}
+						if(this.y <= yyy){
+								this.kaiguan = true;
+								this.kaiguan1 = true;
+								this.kaiguan2 = false;
+								this.kaiguan3 = false;
+							}
+					}
+					
+				};
+			}
+			function xian(){
+				// 设置线条的颜色
+       			ctx.strokeStyle = 'black';
+		        // 设置线条的宽度
+		        ctx.lineWidth = 5;		
+		        // 绘制直线
+		        ctx.beginPath();
+		        // 起点
+		        ctx.moveTo(485, 82);
+		        // 终点
+		        ctx.lineTo(JiaO.x+25, JiaO.y);
+		        ctx.closePath();
+		        ctx.stroke();
+			}
+			function xian1(){
+				// 设置线条的颜色
+       			ctx.strokeStyle = 'red';
+		        // 设置线条的宽度
+		        ctx.lineWidth = 5;		
+		        // 绘制直线
+		        ctx.beginPath();
+		        // 起点
+		        ctx.moveTo(485, 82);
+		        // 终点
+		        ctx.lineTo(dayuanx,dayuany);
+		        ctx.closePath();
+		        ctx.stroke();
+			}
+			function Delete(){
+				var arr = [];
+				var aarr = [];
+				for (var i=0; i < Goods.length; i++) {
+					if(!Goods[i].xiaoshi){
+						arr.splice(arr.length,0,Goods[i]);
+					}
+				};
+				Goods = arr;
+				arr = [];
+				for (var j=0; j < objects.length; j++) {
+					if(!objects[j].xiaoshi){
+						aarr.splice(aarr.length,0,objects[j]);
+					}
+				};
+				objects = aarr;
+				aarr = [];
+			}
+			var eee;
+			var ee = false;
+			function wenzi(){
+				ctx.font ="bold 45px 幼圆";
+				ctx.fillStyle = "black";		
+				if (ee){
+					ctx.fillText("o了，拜拜",265,256);
+				}else{
+					ctx.fillText("欢迎光临，要买些什么？😊",100,256);
+				}
+				ctx.font ="bold 30px 幼圆";
+				ctx.fillStyle = "black";
+				switch(eee){
+					case 0:				  				
+						ctx.fillText("狙击枪：随大帅征战南北的狙击枪，可以为你添加瞄准线，时效",50,600);
+						ctx.fillText("为一局。(二手武器，可能精度会有些偏差，但问题不大。)",170,638);
+						break;
+					case 1:
+						ctx.fillText("手雷：大帅从海王手中抢到的手雷，当你抓到不想要的东西时，",50,600);
+						ctx.fillText("可以炸掉。",140,638);
+						break;
+					case 2:
+						ctx.fillText("鸡汤：不咸不淡的鸡汤，可以让你下一局游戏时长增加15秒。",50,600);
+						break;
+					case 3:
+						ctx.fillText("鸡肉卷(卷王专用)：可以让你抓东西更迅速，时效为一局。",50,600);
+						break;
+					  }
+			}
+				
+			function checkHit(){
+				for (var i=0; i < objects.length; i++) {
+					if(JiaO.hit(objects[i])){
+						if(objects[i].type == 2){
+							var xx = objects[i].x;
+							var yy = objects[i].y;
+							for (var j=0; j < objects.length; j++) {
+							  if(xx-150<objects[j].x&&objects[j].x<xx+150&&yy-150<objects[j].y&&objects[j].y<yy+150){
+							  	objects[j].xiaoshi = true;
+							  	JiaO.kaiguan3 = true;
+							  	bang.play();
+							  }							
+							};
+						}
+						objects[i].kaiguan = true;
+						JiaO.kaiguan2 = true;
+						if(objects[i].kaiguan1){
+							objects[i].speedx = JiaO.xxxx;
+							objects[i].speedy = JiaO.yyyy;
+						}
+					}
+				};
+			}
+			
+			var JiaO = new jiaO(410,100,jia,51,100);
+			var kggggg = false;	
+			
+			function Buff(){
+				JiaO = new jiaO(410,100,jia,51,100);
+				dayuanx = -258;
+				dayuany = 339;
+				dayuanSpeed = 3.37;
+				gameTime = 30;
+				kg = false;
+				for (var i=0; i < Buffs.length; i++) {
+						if(Buffs[i] == 0){
+							kggggg = true;
+						}
+						if(Buffs[i] == 1){
+							shoulei += 1;
+						}
+						if(Buffs[i] == 2){
+							gameTime = 45;		
+						}
+						if(Buffs[i] == 3){
+							kg = true;
+						}
+				}		
+				
+			}			
+			
+			function dayuan(){
+					if(JiaO.kaiguan){
+						dayuanx+=dayuanSpeed;
+						if(dayuanx>=1223){
+							dayuanSpeed = -3.37;
+							b = new Date().getTime();
+						}else if(dayuanx<=-258){
+							dayuanSpeed = 3.37;
+							c = new Date().getTime();
+							console.log(c-b);
+						};
+						var a = Math.abs(465-dayuanx);
+						var yy= parseInt(Math.sqrt(786*786-a*a));
+						dayuany = 339 + yy;
+					}
+			}
+			
+			
+			var style = window.getComputedStyle(canvas, null);
+			var cssWidth = parseFloat(style["width"]);
+			var cssHeight = parseFloat(style["height"]);
+			var scaleX = canvas.width / cssWidth; // 水平方向的缩放因子
+			var scaleY = canvas.height / cssHeight; // 垂直方向的缩放因子
+			canvas.addEventListener("mousemove", function __handler__(evt) {undefined
+			var x = evt.clientX;
+			var y = evt.clientY;
+			var rect = canvas.getBoundingClientRect();
+			x -= rect.left;
+			y -= rect.top;
+			x *= scaleX; // 修正水平方向的坐标
+			y *= scaleY; // 修正垂直方向的坐标
+			x = parseInt(x);
+			
+			if(state == 4){	
+				for (var i=0; i < Goods.length; i++) {
+					  	if(x>=Goods[i].x&&x<=Goods[i].x+Goods[i].width&&y>=Goods[i].y&&y<=Goods[i].y+Goods[i].height){
+					  		eee = Goods[i].type;	
+					  	}
+					  }
+			}
+			
+				
+			canvas.onclick = function(){
+				if (state == 0){
+					state = 1;
+				}
+				if (state == 2){
+					JiaO.kaiguan = false;
+						if(shoulei > 0){
+						for(var i =0;i<objects.length;i++){
+								if(objects[i].kaiguan){
+									bang.play();
+									objects[i].xiaoshi = true;
+									JiaO.kaiguan3 = true; 
+									shoulei--;
+							}	
+						}
+					}
+				}
+				if (state == 4 ){
+					if(x>=821&&x<=962&&y>=7&&y<=62){			
+							if(eK==0){
+								ee = true;
+								gq += 1;
+								goalfen = goalfen+270*gq+5;
+								bgm4.play();
+								eK++;
+								timeoutId = window.setTimeout(function(){
+									state = 1;
+								},1300);
+							}	
+					}
+					for (var i=0; i < Goods.length; i++) {
+						if(x>=Goods[i].x&&x<=Goods[i].x+Goods[i].width&&y>=Goods[i].y&&y<=Goods[i].y+Goods[i].height){
+					  		if(money>=Goods[i].price){
+					  			EK++;
+					  			Buffs.splice(Buffs.length,0,Goods[i].type);
+					  			Goods[i].xiaoshi = true;
+					  			Goods[i].bgm.play();
+								money -= Goods[i].price;
+					  		}else{
+					  			alert("您的钱不够，无法购买");
+					  		}		
+						}
+					};
+				}
+				};
+			});
+			var nnnnn = 0;
+			var nnnn = 0;
+			//循环
+			setInterval(function(){			
+				switch(state){
+					case 0://主界面
+						ctx.drawImage(bg1,0,0);
+						break;
+					case 1://加载
+						nnn = 0;
+						nn = 0;
+						if(nnnn == 0){
+							Buff();
+						}
+						nnnn++;
+						dayuanx = -258;
+						dayuany = 339;
+						dayuanSpeed = 3.37;
+						Goods = [];
+						Buffs = [];
+						nnnnn = 0;
+						bgm1.play();
+						ctx.drawImage(bg2,0,0);
+						ctx.font ="bold 80px 宋体";
+						ctx.fillStyle = "rgb(0,205,0)";
+						ctx.fillText("$"+goalfen,275,350);
+						timeoutId = window.setTimeout(function(){
+							state = 2;
+						},2500);
+						break;
+					case 2://游戏
+						Delete();
+						dayuan();
+						bgm.play();
+						ctx.drawImage(bg3,0,0);				
+						JiaO.paint();
+						JiaO.step();
+						xian();
+						ctx.font ="bold 40px 幼圆";
+						ctx.fillStyle = "rgb(275,104,0)";
+						ctx.fillText(gameTime,910,45);
+						ctx.fillText(gq,873,88);
+						ctx.font ="bold 35px 幼圆";
+						ctx.fillStyle = "red";
+						ctx.fillText("$"+goalfen,145,90);
+						ctx.fillStyle = "rgb(1,159,0)";
+						ctx.fillText("$"+money,90,42);
+						if(gameTime == -1){
+							bgm.pause();
+							if(money >= goalfen){
+								state = 3;
+								objects = [];
+							}else{
+								state = 5;
+							}
+						}else{
+							timej();
+						}
+						if(nnnnn == 0){
+							Append();
+						}
+						nnnnn++;
+						for(var i =0;i<objects.length;i++){
+							objects[i].paint();
+							objects[i].step();
+						}
+						checkHit();
+						ctx.drawImage(bg8,600,30,40,58);
+						ctx.font ="bold 40px 幼圆";
+						ctx.fillStyle = "black";
+						ctx.fillText("：" + shoulei,655,75);
+						if(kggggg){
+							xian1();
+						}
+						break;
+					case 3://胜利
+						if(nn == 0){
+							diey.play();
+							bgm2.play();
+							nn++;
+						}
+						Goods = [new goods(10,460,bg11,260,58,0,400,jv),
+								new goods(305,405,bg8,80,115,1,50,sl),
+								new goods(400,405,bg9,150,112,2,100,bgm5),
+								new goods(550,420,bg10,150,86,3,70,bz)];
+						ee = false;
+						ctx.drawImage(bg4,0,0);
+						ctx.drawImage(zhh,0,400,300,300);
+						timeoutId = window.setTimeout(function(){
+							state = 4;
+						},2800);
+						break; 
+					case 4://商店
+						if(nnn == 0){
+							bycg.play();
+							nnn++;
+						}
+						ctx.drawImage(bg5,0,0);
+						kggggg = false;
+						Delete();		
+						wenzi();
+						nnnn = 0;
+						for(var i = 0;i<Goods.length;i++){
+							Goods[i].paint();
+						}
+						break;
+					case 5://失败
+						if(n){
+							bgm3.play();
+						}
+						n=false;
+						ctx.drawImage(bg6,0,0);
+						ctx.drawImage(ylk,0,50,250,530);
+						endmoney();
+						break;
+				}
+					
+			},1);
+		</script>
+	</body>
+</html>
